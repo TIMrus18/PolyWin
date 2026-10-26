@@ -70,7 +70,7 @@
 
   .big { font-size: 34px; font-weight: 800; margin: 8px 0 2px; letter-spacing: -.02em; }
   .big.good { color: var(--good); } .big.bad { color: var(--bad); } .big.warn { color: var(--warn); }
-  .profit { color: var(--hint); font-size: 15px; margin-bottom: 12px; }
+  .profit { color: var(--hint); font-size: 15px; margin-bottom: 12px; line-height: 1.5; }
   .profit b { color: var(--text); }
   .pos { color: var(--good); } .neg { color: var(--bad); }
 
@@ -257,7 +257,6 @@
 
   <!-- ===================== МОИ СТАВКИ ===================== -->
   <div id="viewBets" hidden>
-    <!-- ... (остается без изменений) ... -->
     <section class="card">
       <h2>Ставка на Polymarket (исход A)</h2>
       <div class="row">
@@ -506,7 +505,6 @@
       '</div>';
     }).join('');
 
-    // Обработчики изменения
     list.querySelectorAll('input, select').forEach(function(inp) {
       inp.addEventListener('input', function(e) {
         var row = e.target.closest('.m-row');
@@ -520,7 +518,6 @@
       });
     });
 
-    // Обработчики удаления
     list.querySelectorAll('.m-del').forEach(function(btn) {
       btn.addEventListener('click', function(e) {
         var idx = parseInt(e.target.getAttribute('data-i'), 10);
@@ -539,7 +536,6 @@
     saveMulti();
     renderMultiList();
     calcMulti();
-    // Скролл к последней добавленной ставке
     setTimeout(function() { $('multiList').lastElementChild.scrollIntoView({behavior: 'smooth', block: 'center'}); }, 100);
   });
 
@@ -574,13 +570,14 @@
     empty.hidden = true; body.hidden = false;
 
     var minPayout = Infinity;
+    var worstName = '';
     var bestProfit = -Infinity;
     var bestName = '';
-    var profits = payouts.map(function(p) {
+
+    payouts.forEach(function(p) {
       var prof = p.payout - totalUsd;
-      if (p.payout < minPayout) minPayout = p.payout;
+      if (p.payout < minPayout) { minPayout = p.payout; worstName = p.name; }
       if (prof > bestProfit) { bestProfit = prof; bestName = p.name; }
-      return { name: p.name, prof: prof };
     });
 
     var guaranteedProfit = minPayout - totalUsd;
@@ -594,7 +591,9 @@
     } else {
       badge.className = 'badge bad'; badge.textContent = 'Вилки нет';
       big.className = 'big bad'; big.textContent = sgn(guaranteedProfit);
-      $('mSub').innerHTML = 'Худший исход: ' + esc(bestName) + ' даст <b class="pos">' + sgn(bestProfit) + '</b>';
+      // ИСПРАВЛЕНО: Теперь выводим и худший, и лучший исход
+      $('mSub').innerHTML = 'Худший исход: ' + esc(worstName) + ' принесет <b class="neg">' + sgn(guaranteedProfit) + '</b><br>' +
+                            'Лучший исход: ' + esc(bestName) + ' принесет <b class="pos">' + sgn(bestProfit) + '</b>';
     }
 
     $('mTotal').textContent = usd(totalUsd);

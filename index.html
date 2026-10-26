@@ -1,192 +1,438 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Калькулятор вилок</title>
-    <!-- Подключаем официальный скрипт Telegram WebApp -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        :root {
-            /* Используем цвета из темы Telegram */
-            --bg-color: var(--tg-theme-bg-color, #ffffff);
-            --text-color: var(--tg-theme-text-color, #000000);
-            --hint-color: var(--tg-theme-hint-color, #999999);
-            --button-color: var(--tg-theme-button-color, #2481cc);
-            --button-text-color: var(--tg-theme-button-text-color, #ffffff);
-            --secondary-bg: var(--tg-theme-secondary-bg-color, #f4f4f5);
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 16px;
-            box-sizing: border-box;
-        }
-
-        h1 {
-            font-size: 20px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .input-group {
-            margin-bottom: 16px;
-        }
-
-        label {
-            display: block;
-            font-size: 14px;
-            color: var(--hint-color);
-            margin-bottom: 8px;
-        }
-
-        input {
-            width: 100%;
-            padding: 14px;
-            border-radius: 10px;
-            border: none;
-            background-color: var(--secondary-bg);
-            color: var(--text-color);
-            font-size: 16px;
-            box-sizing: border-box;
-            outline: none;
-        }
-
-        input:focus {
-            border: 1px solid var(--button-color);
-        }
-
-        button {
-            width: 100%;
-            padding: 16px;
-            border-radius: 10px;
-            border: none;
-            background-color: var(--button-color);
-            color: var(--button-text-color);
-            font-size: 16px;
-            font-weight: 600;
-            margin-top: 10px;
-            cursor: pointer;
-        }
-
-        button:active {
-            opacity: 0.8;
-        }
-
-        .results {
-            margin-top: 24px;
-            padding: 16px;
-            border-radius: 12px;
-            background-color: var(--secondary-bg);
-            display: none; /* Скрыто по умолчанию */
-        }
-
-        .results.active {
-            display: block;
-        }
-
-        .row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            font-size: 15px;
-        }
-
-        .row:last-child {
-            margin-bottom: 0;
-            padding-top: 12px;
-            border-top: 1px solid var(--hint-color);
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .profit { color: #34c759; }
-        .loss { color: #ff3b30; }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Калькулятор вилок</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root {
+    --fb-bg: #ffffff; --fb-card: #f1f2f4; --fb-text: #111418; --fb-hint: #7d838c;
+    --fb-accent: #2f80ed; --fb-accent-text: #ffffff; --fb-line: rgba(0,0,0,.08);
+    --good: #1fa65a; --bad: #d9534f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --fb-bg: #17212b; --fb-card: #202c38; --fb-text: #f2f4f6; --fb-hint: #8b98a5;
+      --fb-accent: #3d8fe8; --fb-line: rgba(255,255,255,.08);
+      --good: #3ccf7a; --bad: #ef6b66;
+    }
+  }
+  :root {
+    --bg: var(--tg-theme-bg-color, var(--fb-bg));
+    --card: var(--tg-theme-secondary-bg-color, var(--fb-card));
+    --text: var(--tg-theme-text-color, var(--fb-text));
+    --hint: var(--tg-theme-hint-color, var(--fb-hint));
+    --accent: var(--tg-theme-button-color, var(--fb-accent));
+    --accent-text: var(--tg-theme-button-text-color, var(--fb-accent-text));
+    --line: var(--fb-line);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  body { padding: 14px 14px calc(24px + env(safe-area-inset-bottom)); }
+  .wrap { max-width: 480px; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 4px 2px 2px; }
+  .sub { color: var(--hint); font-size: 13px; margin: 0 2px 14px; }
+ 
+  .card { background: var(--card); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+  .card h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em;
+    color: var(--hint); margin: 0 0 10px; }
+ 
+  .seg { display: flex; background: var(--bg); border-radius: 10px; padding: 3px; gap: 3px; margin-bottom: 10px; }
+  .seg button { flex: 1; border: 0; background: transparent; color: var(--hint); padding: 8px 4px;
+    border-radius: 8px; font: inherit; font-size: 14px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-text); font-weight: 600; }
+ 
+  label.field { display: block; }
+  .lbl { display: block; font-size: 13px; color: var(--hint); margin-bottom: 4px; }
+  .inp { display: flex; align-items: center; background: var(--bg); border-radius: 10px;
+    border: 1px solid transparent; padding: 0 12px; }
+  .inp:focus-within { border-color: var(--accent); }
+  .inp input { flex: 1; min-width: 0; width: 100%; border: 0; outline: 0; background: transparent;
+    color: var(--text); font: inherit; font-size: 18px; font-weight: 600; padding: 11px 0; }
+  .inp .unit { color: var(--hint); font-size: 15px; margin-left: 8px; }
+ 
+  .row { display: flex; gap: 10px; }
+  .row > * { flex: 1; min-width: 0; }
+  .hintline { font-size: 13px; color: var(--hint); margin-top: 8px; }
+  .hintline b { color: var(--text); }
+ 
+  .check { display: flex; align-items: center; gap: 10px; margin: 12px 0 0; font-size: 15px; cursor: pointer; }
+  .check input { width: 20px; height: 20px; accent-color: var(--accent); }
+  .feebox { margin-top: 10px; }
+  .feebox[hidden] { display: none; }
+ 
+  .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 13px; font-weight: 700; }
+  .badge.good { background: color-mix(in srgb, var(--good) 18%, transparent); color: var(--good); }
+  .badge.bad  { background: color-mix(in srgb, var(--bad) 18%, transparent);  color: var(--bad); }
+  .badge.idle { background: var(--bg); color: var(--hint); }
+ 
+  .big { font-size: 34px; font-weight: 800; margin: 8px 0 2px; letter-spacing: -.02em; }
+  .big.good { color: var(--good); } .big.bad { color: var(--bad); }
+  .profit { color: var(--hint); font-size: 15px; margin-bottom: 12px; }
+  .profit b { color: var(--text); }
+ 
+  .legs { display: grid; gap: 8px; }
+  .leg { background: var(--bg); border-radius: 12px; padding: 12px; }
+  .leg .top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .leg .name { font-weight: 600; }
+  .leg .odd { color: var(--hint); font-size: 14px; }
+  .leg .stake { font-size: 24px; font-weight: 800; margin-top: 2px; }
+  .leg .meta { color: var(--hint); font-size: 13px; margin-top: 2px; }
+ 
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .stat { background: var(--bg); border-radius: 12px; padding: 10px 12px; }
+  .stat .k { color: var(--hint); font-size: 12px; }
+  .stat .v { font-weight: 700; font-size: 16px; margin-top: 2px; }
+ 
+  .btn { width: 100%; border: 0; border-radius: 12px; padding: 14px; font: inherit; font-size: 16px; font-weight: 600;
+    background: var(--accent); color: var(--accent-text); cursor: pointer; margin-top: 4px; }
+  .btn:disabled { opacity: .45; }
+  .note { color: var(--hint); font-size: 12px; margin: 12px 4px 0; }
+  .empty { color: var(--hint); font-size: 14px; padding: 6px 0 2px; }
+</style>
 </head>
 <body>
-
-    <h1>📊 Калькулятор вилок</h1>
-
-    <div class="input-group">
-        <label>Банк ($)</label>
-        <input type="number" id="bank" value="100" step="1" inputmode="decimal">
+<div class="wrap">
+  <h1>Калькулятор вилок</h1>
+  <p class="sub">Polymarket + букмекер · расчёт ставок с комиссией</p>
+ 
+  <!-- POLYMARKET -->
+  <section class="card">
+    <h2>Polymarket (нога A)</h2>
+    <div class="seg" id="segPType">
+      <button type="button" data-val="cents" aria-pressed="true">Цена, ¢</button>
+      <button type="button" data-val="odds" aria-pressed="false">Коэффициент</button>
     </div>
-
-    <div class="input-group">
-        <label>Коэффициент 1</label>
-        <input type="number" id="odd1" placeholder="Например: 1.85" step="0.01" inputmode="decimal">
+    <label class="field">
+      <span class="lbl" id="pLabel">Цена акции</span>
+      <div class="inp"><input id="pIn" type="text" inputmode="decimal" autocomplete="off" placeholder="54"><span class="unit" id="pUnit">¢</span></div>
+    </label>
+    <label class="check"><input type="checkbox" id="feeOn" checked> Учитывать комиссию тейкера</label>
+    <div class="feebox" id="feeBox">
+      <label class="field">
+        <span class="lbl">Ставка комиссии (спорт/киберспорт ~5%)</span>
+        <div class="inp"><input id="fee" type="text" inputmode="decimal" autocomplete="off" value="5"><span class="unit">%</span></div>
+      </label>
     </div>
-
-    <div class="input-group">
-        <label>Коэффициент 2</label>
-        <input type="number" id="odd2" placeholder="Например: 2.27" step="0.01" inputmode="decimal">
+    <div class="hintline" id="pHint"></div>
+  </section>
+ 
+  <!-- БУКМЕКЕР -->
+  <section class="card">
+    <h2>Букмекер (нога B)</h2>
+    <label class="field">
+      <span class="lbl">Коэффициент на противоположный исход</span>
+      <div class="inp"><input id="wIn" type="text" inputmode="decimal" autocomplete="off" placeholder="2.27"><span class="unit">×</span></div>
+    </label>
+  </section>
+ 
+  <!-- БАНК -->
+  <section class="card">
+    <h2>Сумма</h2>
+    <div class="seg" id="segMode">
+      <button type="button" data-val="bank" aria-pressed="true">Общий банк</button>
+      <button type="button" data-val="a" aria-pressed="false">Ставка A</button>
+      <button type="button" data-val="b" aria-pressed="false">Ставка B</button>
     </div>
-
-    <button onclick="calculate()">Рассчитать</button>
-
-    <div class="results" id="results">
-        <div class="row">
-            <span>Ставка 1:</span>
-            <span id="res-stake1">0.00 $</span>
-        </div>
-        <div class="row">
-            <span>Ставка 2:</span>
-            <span id="res-stake2">0.00 $</span>
-        </div>
-        <div class="row" style="border-top: none; font-weight: normal; color: var(--hint-color); font-size: 13px;">
-            <span>Маржа:</span>
-            <span id="res-margin">0.00%</span>
-        </div>
-        <div class="row">
-            <span>Профит:</span>
-            <span id="res-profit" class="profit">0.00 $</span>
-        </div>
+    <div class="row">
+      <label class="field">
+        <span class="lbl" id="amtLabel">Банк</span>
+        <div class="inp"><input id="amt" type="text" inputmode="decimal" autocomplete="off" value="100"><span class="unit">$</span></div>
+      </label>
+      <label class="field">
+        <span class="lbl">Курс (необяз.)</span>
+        <div class="inp"><input id="rate" type="text" inputmode="decimal" autocomplete="off" placeholder="95"><span class="unit">₽/$</span></div>
+      </label>
     </div>
-
-    <script>
-        // Инициализация Telegram WebApp
-        let tg = window.Telegram.WebApp;
-        tg.expand(); // Раскрываем приложение на весь экран
-        tg.ready();
-
-        function calculate() {
-            const bank = parseFloat(document.getElementById('bank').value);
-            const odd1 = parseFloat(document.getElementById('odd1').value);
-            const odd2 = parseFloat(document.getElementById('odd2').value);
-
-            if (!bank || !odd1 || !odd2 || odd1 <= 1 || odd2 <= 1) {
-                tg.showAlert("Пожалуйста, введите корректные числа. Кэфы должны быть больше 1.");
-                return;
-            }
-
-            // Математика вилки
-            const margin = (1 / odd1) + (1 / odd2);
-            const roi = ((1 / margin) - 1) * 100;
-
-            const stake1 = bank / (odd1 * margin);
-            const stake2 = bank / (odd2 * margin);
-            const profit = (stake1 * odd1) - bank;
-
-            // Форматирование и вывод
-            document.getElementById('res-stake1').innerText = stake1.toFixed(2) + " $";
-            document.getElementById('res-stake2').innerText = stake2.toFixed(2) + " $";
-            document.getElementById('res-margin').innerText = margin.toFixed(4);
-            
-            const profitElem = document.getElementById('res-profit');
-            if (margin < 1) {
-                profitElem.innerText = "+" + profit.toFixed(2) + " $ (" + roi.toFixed(2) + "%)";
-                profitElem.className = "profit";
-            } else {
-                profitElem.innerText = profit.toFixed(2) + " $ (" + roi.toFixed(2) + "%)";
-                profitElem.className = "loss";
-            }
-
-            document.getElementById('results').classList.add('active');
-        }
-    </script>
+    <div class="hintline">Суммы считаются в долларах. Если указать курс, ставка на букмекере покажется ещё и в рублях.</div>
+  </section>
+ 
+  <!-- РЕЗУЛЬТАТ -->
+  <section class="card" id="result">
+    <h2>Результат</h2>
+    <div id="resEmpty" class="empty">Введи цену на Polymarket и коэффициент букмекера.</div>
+    <div id="resBody" hidden>
+      <span class="badge" id="badge"></span>
+      <div class="big" id="roi"></div>
+      <div class="profit" id="profit"></div>
+ 
+      <div class="legs">
+        <div class="leg">
+          <div class="top"><span class="name">Polymarket</span><span class="odd" id="aOdd"></span></div>
+          <div class="stake" id="aStake"></div>
+          <div class="meta" id="aMeta"></div>
+        </div>
+        <div class="leg">
+          <div class="top"><span class="name">Букмекер</span><span class="odd" id="bOdd"></span></div>
+          <div class="stake" id="bStake"></div>
+          <div class="meta" id="bMeta"></div>
+        </div>
+      </div>
+ 
+      <div class="stats">
+        <div class="stat"><div class="k">Всего вложить</div><div class="v" id="sTotal"></div></div>
+        <div class="stat"><div class="k">Вернётся</div><div class="v" id="sReturn"></div></div>
+        <div class="stat"><div class="k">Маржа (1/A + 1/B)</div><div class="v" id="sMargin"></div></div>
+        <div class="stat"><div class="k">Комиссия Poly</div><div class="v" id="sFee"></div></div>
+      </div>
+    </div>
+  </section>
+ 
+  <button class="btn" id="copy" disabled>Скопировать расчёт</button>
+  <p class="note">Комиссия Polymarket берётся с тейкера и списывается акциями при покупке: эффективный коэффициент = (1/p) × (1 − ставка × (1 − p)). Мейкер-ордера (лимитные) комиссию не платят. Проверяй ставку на реальном рынке перед сделкой.</p>
+</div>
+ 
+<script>
+(function () {
+  var tg = window.Telegram && window.Telegram.WebApp;
+  if (tg) { try { tg.ready(); tg.expand(); } catch (e) {} }
+ 
+  var $ = function (id) { return document.getElementById(id); };
+  var el = {
+    pIn: $('pIn'), fee: $('fee'), feeOn: $('feeOn'), feeBox: $('feeBox'), wIn: $('wIn'),
+    amt: $('amt'), rate: $('rate'), pLabel: $('pLabel'), pUnit: $('pUnit'), pHint: $('pHint'),
+    amtLabel: $('amtLabel'), copy: $('copy')
+  };
+  var state = { pType: 'cents', mode: 'bank' };
+  var lastText = '';
+ 
+  /* ---------- утилиты ---------- */
+  function num(s) {
+    if (s === null || s === undefined) return NaN;
+    var v = parseFloat(String(s).replace(',', '.').replace(/\s/g, ''));
+    return isNaN(v) ? NaN : v;
+  }
+  function fmt(v, d) {
+    return v.toLocaleString('ru-RU', { minimumFractionDigits: d, maximumFractionDigits: d });
+  }
+  function usd(v) { return '$' + fmt(v, 2); }
+  function haptic(kind) {
+    try { if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred(kind); } catch (e) {}
+  }
+ 
+  /* ---------- сохранение настроек ---------- */
+  var KEY = 'arbcalc_v1';
+  function save() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({
+        pType: state.pType, mode: state.mode, feeOn: el.feeOn.checked,
+        fee: el.fee.value, amt: el.amt.value, rate: el.rate.value
+      }));
+    } catch (e) {}
+  }
+  function load() {
+    try {
+      var s = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if (!s) return;
+      if (s.pType) state.pType = s.pType;
+      if (s.mode) state.mode = s.mode;
+      if (typeof s.feeOn === 'boolean') el.feeOn.checked = s.feeOn;
+      if (s.fee) el.fee.value = s.fee;
+      if (s.amt) el.amt.value = s.amt;
+      if (s.rate) el.rate.value = s.rate;
+    } catch (e) {}
+  }
+ 
+  /* ---------- сегменты ---------- */
+  function setSeg(id, val) {
+    var btns = $(id).querySelectorAll('button');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].setAttribute('aria-pressed', btns[i].getAttribute('data-val') === val ? 'true' : 'false');
+    }
+  }
+  function bindSeg(id, onPick) {
+    $(id).addEventListener('click', function (e) {
+      var b = e.target.closest('button');
+      if (!b) return;
+      onPick(b.getAttribute('data-val'));
+    });
+  }
+ 
+  function applyPType() {
+    setSeg('segPType', state.pType);
+    if (state.pType === 'cents') {
+      el.pLabel.textContent = 'Цена акции'; el.pUnit.textContent = '¢'; el.pIn.placeholder = '54';
+    } else {
+      el.pLabel.textContent = 'Коэффициент (брутто, 1/цена)'; el.pUnit.textContent = '×'; el.pIn.placeholder = '1.85';
+    }
+  }
+  function applyMode() {
+    setSeg('segMode', state.mode);
+    el.amtLabel.textContent = state.mode === 'bank' ? 'Банк (на обе ноги)'
+      : state.mode === 'a' ? 'Ставка на Polymarket' : 'Ставка на букмекере ($)';
+  }
+ 
+  /* ---------- расчёт ---------- */
+  function calc() {
+    var pv = num(el.pIn.value), price, gross;
+    if (state.pType === 'cents') {
+      if (!(pv > 0 && pv < 100)) return null;
+      price = pv / 100; gross = 1 / price;
+    } else {
+      if (!(pv > 1)) return null;
+      gross = pv; price = 1 / pv;
+    }
+    var feeRate = 0;
+    if (el.feeOn.checked) {
+      var f = num(el.fee.value);
+      feeRate = (f >= 0 && f < 50) ? f / 100 : 0;
+    }
+    var oA = gross * (1 - feeRate * (1 - price));
+    var oB = num(el.wIn.value);
+    if (!(oB > 1) || !(oA > 1)) return { partial: true, price: price, gross: gross, oA: oA, feeRate: feeRate };
+ 
+    var margin = 1 / oA + 1 / oB;
+    var amt = num(el.amt.value);
+    var out = { price: price, gross: gross, oA: oA, oB: oB, feeRate: feeRate, margin: margin, roi: (1 / margin - 1) * 100 };
+    if (!(amt > 0)) return out;
+ 
+    var sA, sB, R;
+    if (state.mode === 'bank') { R = amt / margin; sA = R / oA; sB = R / oB; }
+    else if (state.mode === 'a') { sA = amt; R = sA * oA; sB = R / oB; }
+    else { sB = amt; R = sB * oB; sA = R / oA; }
+ 
+    out.sA = sA; out.sB = sB; out.R = R; out.S = sA + sB; out.profit = R - out.S;
+    out.sharesBuy = sA / price;           // куплено акций (брутто)
+    out.feeUsd = sA * feeRate * (1 - price); // комиссия в $-эквиваленте
+    return out;
+  }
+ 
+  /* ---------- вывод ---------- */
+  function render() {
+    var r = calc();
+ 
+    // подсказка под полем Poly
+    if (r && r.oA) {
+      el.pHint.innerHTML = 'Цена <b>' + fmt(r.price * 100, 1) + '¢</b> → брутто <b>' + fmt(r.gross, 3) +
+        '</b>, после комиссии <b>' + fmt(r.oA, 3) + '</b>';
+    } else {
+      el.pHint.textContent = '';
+    }
+ 
+    var empty = $('resEmpty'), body = $('resBody');
+    lastText = '';
+    el.copy.disabled = true;
+ 
+    if (!r || r.partial) {
+      empty.hidden = false; body.hidden = true;
+      empty.textContent = r && r.partial ? 'Введи коэффициент букмекера (больше 1).' : 'Введи цену на Polymarket и коэффициент букмекера.';
+      return;
+    }
+    empty.hidden = true; body.hidden = false;
+ 
+    var good = r.roi > 0;
+    var badge = $('badge');
+    badge.className = 'badge ' + (good ? 'good' : 'bad');
+    badge.textContent = good ? 'Вилка есть' : 'Вилки нет';
+    var big = $('roi');
+    big.className = 'big ' + (good ? 'good' : 'bad');
+    big.textContent = (r.roi >= 0 ? '+' : '') + fmt(r.roi, 2) + '%';
+ 
+    $('aOdd').textContent = '× ' + fmt(r.oA, 3) + (r.feeRate ? ' (net)' : '');
+    $('bOdd').textContent = '× ' + fmt(r.oB, 3);
+    $('sMargin').textContent = fmt(r.margin, 4);
+ 
+    if (r.sA === undefined) {
+      $('profit').innerHTML = 'Введи сумму, чтобы получить ставки.';
+      $('aStake').textContent = '—'; $('bStake').textContent = '—';
+      $('aMeta').textContent = ''; $('bMeta').textContent = '';
+      $('sTotal').textContent = '—'; $('sReturn').textContent = '—'; $('sFee').textContent = '—';
+      return;
+    }
+ 
+    $('profit').innerHTML = (r.profit >= 0 ? 'Гарантированный профит ' : 'Гарантированный убыток ') +
+      '<b>' + (r.profit >= 0 ? '+' : '−') + usd(Math.abs(r.profit)) + '</b>';
+    $('aStake').textContent = usd(r.sA);
+    $('aMeta').textContent = 'Купить ≈ ' + fmt(r.sharesBuy, 2) + ' акций по ' + fmt(r.price * 100, 1) + '¢';
+    $('bStake').textContent = usd(r.sB);
+ 
+    var rate = num(el.rate.value);
+    if (rate > 0) {
+      $('bStake').textContent = fmt(r.sB * rate, 0) + ' ₽';
+      $('bMeta').textContent = '≈ ' + usd(r.sB) + ' по курсу ' + fmt(rate, 2);
+    } else {
+      $('bMeta').textContent = '';
+    }
+    $('sTotal').textContent = usd(r.S);
+    $('sReturn').textContent = usd(r.R);
+    $('sFee').textContent = r.feeRate ? usd(r.feeUsd) : 'нет';
+ 
+    lastText =
+      'Вилка: ' + (good ? '+' : '') + fmt(r.roi, 2) + '% | профит ' + (r.profit >= 0 ? '+' : '−') + usd(Math.abs(r.profit)) + '\n' +
+      'Poly: ' + usd(r.sA) + ' @ ' + fmt(r.price * 100, 1) + '¢ (кэф ' + fmt(r.oA, 3) + (r.feeRate ? ' после комиссии' : '') + ')\n' +
+      'Букмекер: ' + (rate > 0 ? fmt(r.sB * rate, 0) + ' ₽ (' + usd(r.sB) + ')' : usd(r.sB)) + ' @ ' + fmt(r.oB, 2) + '\n' +
+      'Банк: ' + usd(r.S) + ' → вернётся ' + usd(r.R);
+    el.copy.disabled = false;
+  }
+ 
+  function onChange() { save(); render(); }
+ 
+  /* ---------- события ---------- */
+  bindSeg('segPType', function (v) {
+    if (v === state.pType) return;
+    // пересчитываем введённое значение в другой формат
+    var pv = num(el.pIn.value);
+    if (pv > 0) {
+      if (v === 'odds' && pv < 100) el.pIn.value = String(Math.round(10000 / pv) / 100);
+      else if (v === 'cents' && pv > 1) el.pIn.value = String(Math.round(10000 / pv) / 100);
+    }
+    state.pType = v; applyPType(); onChange();
+  });
+  bindSeg('segMode', function (v) { state.mode = v; applyMode(); onChange(); });
+ 
+  ['pIn', 'fee', 'wIn', 'amt', 'rate'].forEach(function (id) { el[id].addEventListener('input', onChange); });
+  el.feeOn.addEventListener('change', function () { el.feeBox.hidden = !el.feeOn.checked; onChange(); });
+ 
+  el.copy.addEventListener('click', function () {
+    if (!lastText) return;
+    var done = function () {
+      var old = el.copy.textContent;
+      el.copy.textContent = 'Скопировано ✓';
+      haptic('success');
+      setTimeout(function () { el.copy.textContent = old; }, 1400);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(lastText).then(done, fallback);
+    } else { fallback(); }
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = lastText; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+  });
+ 
+  /* ---------- параметры из ссылки: ?p=54&w=2.27&b=100&fee=5&mode=bank ---------- */
+  function fromUrl() {
+    var q = new URLSearchParams(location.search);
+    var startParam = '';
+    try { startParam = (tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) || ''; } catch (e) {}
+    if (!q.has('p') && startParam) { q = new URLSearchParams(startParam.replace(/_/g, '&').replace(/-/g, '=')); }
+ 
+    if (q.has('p')) {
+      var p = num(q.get('p'));
+      if (p > 0) {
+        if (p <= 1) p = p * 100;             // 0.54 -> 54¢
+        state.pType = 'cents';
+        el.pIn.value = String(Math.round(p * 100) / 100);
+      }
+    }
+    if (q.has('w')) el.wIn.value = q.get('w');
+    if (q.has('b')) { el.amt.value = q.get('b'); state.mode = 'bank'; }
+    if (q.has('fee')) { el.fee.value = q.get('fee'); el.feeOn.checked = num(q.get('fee')) > 0; }
+    if (q.has('rate')) el.rate.value = q.get('rate');
+    if (q.get('mode') === 'a' || q.get('mode') === 'b') state.mode = q.get('mode');
+  }
+ 
+  load();
+  fromUrl();
+  applyPType(); applyMode();
+  el.feeBox.hidden = !el.feeOn.checked;
+  render();
+})();
+</script>
 </body>
 </html>

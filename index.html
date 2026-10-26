@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Калькулятор вилок</title>
+    <!-- Подключаем официальный скрипт Telegram WebApp -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            /* Используем цвета из темы Telegram */
+            --bg-color: var(--tg-theme-bg-color, #ffffff);
+            --text-color: var(--tg-theme-text-color, #000000);
+            --hint-color: var(--tg-theme-hint-color, #999999);
+            --button-color: var(--tg-theme-button-color, #2481cc);
+            --button-text-color: var(--tg-theme-button-text-color, #ffffff);
+            --secondary-bg: var(--tg-theme-secondary-bg-color, #f4f4f5);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            color: var(--hint-color);
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: none;
+            background-color: var(--secondary-bg);
+            color: var(--text-color);
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        input:focus {
+            border: 1px solid var(--button-color);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            border-radius: 10px;
+            border: none;
+            background-color: var(--button-color);
+            color: var(--button-text-color);
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        button:active {
+            opacity: 0.8;
+        }
+
+        .results {
+            margin-top: 24px;
+            padding: 16px;
+            border-radius: 12px;
+            background-color: var(--secondary-bg);
+            display: none; /* Скрыто по умолчанию */
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+
+        .row:last-child {
+            margin-bottom: 0;
+            padding-top: 12px;
+            border-top: 1px solid var(--hint-color);
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .profit { color: #34c759; }
+        .loss { color: #ff3b30; }
+    </style>
+</head>
+<body>
+
+    <h1>📊 Калькулятор вилок</h1>
+
+    <div class="input-group">
+        <label>Банк ($)</label>
+        <input type="number" id="bank" value="100" step="1" inputmode="decimal">
+    </div>
+
+    <div class="input-group">
+        <label>Коэффициент 1</label>
+        <input type="number" id="odd1" placeholder="Например: 1.85" step="0.01" inputmode="decimal">
+    </div>
+
+    <div class="input-group">
+        <label>Коэффициент 2</label>
+        <input type="number" id="odd2" placeholder="Например: 2.27" step="0.01" inputmode="decimal">
+    </div>
+
+    <button onclick="calculate()">Рассчитать</button>
+
+    <div class="results" id="results">
+        <div class="row">
+            <span>Ставка 1:</span>
+            <span id="res-stake1">0.00 $</span>
+        </div>
+        <div class="row">
+            <span>Ставка 2:</span>
+            <span id="res-stake2">0.00 $</span>
+        </div>
+        <div class="row" style="border-top: none; font-weight: normal; color: var(--hint-color); font-size: 13px;">
+            <span>Маржа:</span>
+            <span id="res-margin">0.00%</span>
+        </div>
+        <div class="row">
+            <span>Профит:</span>
+            <span id="res-profit" class="profit">0.00 $</span>
+        </div>
+    </div>
+
+    <script>
+        // Инициализация Telegram WebApp
+        let tg = window.Telegram.WebApp;
+        tg.expand(); // Раскрываем приложение на весь экран
+        tg.ready();
+
+        function calculate() {
+            const bank = parseFloat(document.getElementById('bank').value);
+            const odd1 = parseFloat(document.getElementById('odd1').value);
+            const odd2 = parseFloat(document.getElementById('odd2').value);
+
+            if (!bank || !odd1 || !odd2 || odd1 <= 1 || odd2 <= 1) {
+                tg.showAlert("Пожалуйста, введите корректные числа. Кэфы должны быть больше 1.");
+                return;
+            }
+
+            // Математика вилки
+            const margin = (1 / odd1) + (1 / odd2);
+            const roi = ((1 / margin) - 1) * 100;
+
+            const stake1 = bank / (odd1 * margin);
+            const stake2 = bank / (odd2 * margin);
+            const profit = (stake1 * odd1) - bank;
+
+            // Форматирование и вывод
+            document.getElementById('res-stake1').innerText = stake1.toFixed(2) + " $";
+            document.getElementById('res-stake2').innerText = stake2.toFixed(2) + " $";
+            document.getElementById('res-margin').innerText = margin.toFixed(4);
+            
+            const profitElem = document.getElementById('res-profit');
+            if (margin < 1) {
+                profitElem.innerText = "+" + profit.toFixed(2) + " $ (" + roi.toFixed(2) + "%)";
+                profitElem.className = "profit";
+            } else {
+                profitElem.innerText = profit.toFixed(2) + " $ (" + roi.toFixed(2) + "%)";
+                profitElem.className = "loss";
+            }
+
+            document.getElementById('results').classList.add('active');
+        }
+    </script>
+</body>
+</html>

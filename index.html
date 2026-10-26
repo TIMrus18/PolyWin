@@ -9,13 +9,13 @@
   :root {
     --fb-bg: #ffffff; --fb-card: #f1f2f4; --fb-text: #111418; --fb-hint: #7d838c;
     --fb-accent: #2f80ed; --fb-accent-text: #ffffff; --fb-line: rgba(0,0,0,.08);
-    --good: #1fa65a; --bad: #d9534f;
+    --good: #1fa65a; --bad: #d9534f; --warn: #e0a100;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --fb-bg: #17212b; --fb-card: #202c38; --fb-text: #f2f4f6; --fb-hint: #8b98a5;
       --fb-accent: #3d8fe8; --fb-line: rgba(255,255,255,.08);
-      --good: #3ccf7a; --bad: #ef6b66;
+      --good: #3ccf7a; --bad: #ef6b66; --warn: #f0b429;
     }
   }
   :root {
@@ -32,6 +32,7 @@
     font: 16px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
   body { padding: 14px 14px calc(24px + env(safe-area-inset-bottom)); }
   .wrap { max-width: 480px; margin: 0 auto; }
+  [hidden] { display: none !important; }
   h1 { font-size: 20px; margin: 4px 2px 2px; }
   .sub { color: var(--hint); font-size: 13px; margin: 0 2px 14px; }
  
@@ -43,6 +44,8 @@
   .seg button { flex: 1; border: 0; background: transparent; color: var(--hint); padding: 8px 4px;
     border-radius: 8px; font: inherit; font-size: 14px; cursor: pointer; }
   .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-text); font-weight: 600; }
+  #segView { margin-bottom: 12px; }
+  #segView button { font-size: 13px; padding: 9px 2px; }
  
   label.field { display: block; }
   .lbl { display: block; font-size: 13px; color: var(--hint); margin-bottom: 4px; }
@@ -51,27 +54,29 @@
   .inp:focus-within { border-color: var(--accent); }
   .inp input { flex: 1; min-width: 0; width: 100%; border: 0; outline: 0; background: transparent;
     color: var(--text); font: inherit; font-size: 18px; font-weight: 600; padding: 11px 0; }
+  .inp input.txt { font-size: 16px; font-weight: 500; }
   .inp .unit { color: var(--hint); font-size: 15px; margin-left: 8px; }
  
   .row { display: flex; gap: 10px; }
   .row > * { flex: 1; min-width: 0; }
+  .gap { margin-top: 10px; }
   .hintline { font-size: 13px; color: var(--hint); margin-top: 8px; }
   .hintline b { color: var(--text); }
  
   .check { display: flex; align-items: center; gap: 10px; margin: 12px 0 0; font-size: 15px; cursor: pointer; }
   .check input { width: 20px; height: 20px; accent-color: var(--accent); }
   .feebox { margin-top: 10px; }
-  .feebox[hidden] { display: none; }
  
   .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 13px; font-weight: 700; }
   .badge.good { background: color-mix(in srgb, var(--good) 18%, transparent); color: var(--good); }
   .badge.bad  { background: color-mix(in srgb, var(--bad) 18%, transparent);  color: var(--bad); }
-  .badge.idle { background: var(--bg); color: var(--hint); }
+  .badge.warn { background: color-mix(in srgb, var(--warn) 20%, transparent); color: var(--warn); }
  
   .big { font-size: 34px; font-weight: 800; margin: 8px 0 2px; letter-spacing: -.02em; }
-  .big.good { color: var(--good); } .big.bad { color: var(--bad); }
+  .big.good { color: var(--good); } .big.bad { color: var(--bad); } .big.warn { color: var(--warn); }
   .profit { color: var(--hint); font-size: 15px; margin-bottom: 12px; }
   .profit b { color: var(--text); }
+  .pos { color: var(--good); } .neg { color: var(--bad); }
  
   .legs { display: grid; gap: 8px; }
   .leg { background: var(--bg); border-radius: 12px; padding: 12px; }
@@ -85,12 +90,30 @@
   .stat { background: var(--bg); border-radius: 12px; padding: 10px 12px; }
   .stat .k { color: var(--hint); font-size: 12px; }
   .stat .v { font-weight: 700; font-size: 16px; margin-top: 2px; }
+  .eq { background: var(--bg); border-radius: 12px; padding: 12px; margin-top: 10px; font-size: 14px; line-height: 1.45; }
  
   .btn { width: 100%; border: 0; border-radius: 12px; padding: 14px; font: inherit; font-size: 16px; font-weight: 600;
     background: var(--accent); color: var(--accent-text); cursor: pointer; margin-top: 4px; }
   .btn:disabled { opacity: .45; }
+  .btn.secondary { background: var(--card); color: var(--text); }
+  .btnrow { display: flex; gap: 8px; }
+  .btnrow .btn { flex: 1; margin-top: 0; }
   .note { color: var(--hint); font-size: 12px; margin: 12px 4px 0; }
   .empty { color: var(--hint); font-size: 14px; padding: 6px 0 2px; }
+ 
+  /* история */
+  .hitem { background: var(--card); border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; }
+  .htop { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .htitle { font-weight: 700; overflow-wrap: anywhere; }
+  .hdate { color: var(--hint); font-size: 12px; white-space: nowrap; }
+  .hmeta { color: var(--hint); font-size: 13px; margin-top: 3px; }
+  .hres { margin-top: 8px; font-size: 14px; }
+  .hres b { font-weight: 700; }
+  .hbtns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .mini { border: 0; border-radius: 8px; padding: 8px 10px; font: inherit; font-size: 13px;
+    background: var(--bg); color: var(--text); cursor: pointer; }
+  .mini[aria-pressed="true"] { background: var(--accent); color: var(--accent-text); font-weight: 600; }
+  .mini.danger { color: var(--bad); }
 </style>
 </head>
 <body>
@@ -98,90 +121,222 @@
   <h1>Калькулятор вилок</h1>
   <p class="sub">Polymarket + букмекер · расчёт ставок с комиссией</p>
  
-  <!-- POLYMARKET -->
-  <section class="card">
-    <h2>Polymarket (нога A)</h2>
-    <div class="seg" id="segPType">
-      <button type="button" data-val="cents" aria-pressed="true">Цена, ¢</button>
-      <button type="button" data-val="odds" aria-pressed="false">Коэффициент</button>
-    </div>
-    <label class="field">
-      <span class="lbl" id="pLabel">Цена акции</span>
-      <div class="inp"><input id="pIn" type="text" inputmode="decimal" autocomplete="off" placeholder="54"><span class="unit" id="pUnit">¢</span></div>
-    </label>
-    <label class="check"><input type="checkbox" id="feeOn" checked> Учитывать комиссию тейкера</label>
-    <div class="feebox" id="feeBox">
+  <div class="seg" id="segView">
+    <button type="button" data-val="calc" aria-pressed="true">Расчёт вилки</button>
+    <button type="button" data-val="bets" aria-pressed="false">Мои ставки</button>
+    <button type="button" data-val="hist" aria-pressed="false" id="tabHist">История</button>
+  </div>
+ 
+  <!-- ===================== РАСЧЁТ ВИЛКИ ===================== -->
+  <div id="viewCalc">
+    <section class="card">
+      <h2>Polymarket (нога A)</h2>
+      <div class="seg" id="segPType">
+        <button type="button" data-val="cents" aria-pressed="true">Цена, ¢</button>
+        <button type="button" data-val="odds" aria-pressed="false">Коэффициент</button>
+      </div>
       <label class="field">
-        <span class="lbl">Ставка комиссии (спорт/киберспорт ~5%)</span>
-        <div class="inp"><input id="fee" type="text" inputmode="decimal" autocomplete="off" value="5"><span class="unit">%</span></div>
+        <span class="lbl" id="pLabel">Цена акции</span>
+        <div class="inp"><input id="pIn" type="text" inputmode="decimal" autocomplete="off" placeholder="54"><span class="unit" id="pUnit">¢</span></div>
       </label>
-    </div>
-    <div class="hintline" id="pHint"></div>
-  </section>
+      <label class="check"><input type="checkbox" id="feeOn" checked> Учитывать комиссию тейкера</label>
+      <div class="feebox" id="feeBox">
+        <label class="field">
+          <span class="lbl">Ставка комиссии (спорт/киберспорт ~5%)</span>
+          <div class="inp"><input id="fee" type="text" inputmode="decimal" autocomplete="off" value="5"><span class="unit">%</span></div>
+        </label>
+      </div>
+      <div class="hintline" id="pHint"></div>
+    </section>
  
-  <!-- БУКМЕКЕР -->
-  <section class="card">
-    <h2>Букмекер (нога B)</h2>
-    <label class="field">
-      <span class="lbl">Коэффициент на противоположный исход</span>
-      <div class="inp"><input id="wIn" type="text" inputmode="decimal" autocomplete="off" placeholder="2.27"><span class="unit">×</span></div>
-    </label>
-  </section>
- 
-  <!-- БАНК -->
-  <section class="card">
-    <h2>Сумма</h2>
-    <div class="seg" id="segMode">
-      <button type="button" data-val="bank" aria-pressed="true">Общий банк</button>
-      <button type="button" data-val="a" aria-pressed="false">Ставка A</button>
-      <button type="button" data-val="b" aria-pressed="false">Ставка B</button>
-    </div>
-    <div class="row">
+    <section class="card">
+      <h2>Букмекер (нога B)</h2>
+      <span class="lbl">Валюта букмекера</span>
+      <div class="seg" id="segBCur">
+        <button type="button" data-val="rub" aria-pressed="true">₽ Рубли</button>
+        <button type="button" data-val="usd" aria-pressed="false">$ Доллары</button>
+      </div>
       <label class="field">
-        <span class="lbl" id="amtLabel">Банк</span>
-        <div class="inp"><input id="amt" type="text" inputmode="decimal" autocomplete="off" value="100"><span class="unit">$</span></div>
+        <span class="lbl">Коэффициент на противоположный исход</span>
+        <div class="inp"><input id="wIn" type="text" inputmode="decimal" autocomplete="off" placeholder="2.27"><span class="unit">×</span></div>
       </label>
-      <label class="field">
-        <span class="lbl">Курс (необяз.)</span>
-        <div class="inp"><input id="rate" type="text" inputmode="decimal" autocomplete="off" placeholder="95"><span class="unit">₽/$</span></div>
-      </label>
-    </div>
-    <div class="hintline">Суммы считаются в долларах. Если указать курс, ставка на букмекере покажется ещё и в рублях.</div>
-  </section>
+    </section>
  
-  <!-- РЕЗУЛЬТАТ -->
-  <section class="card" id="result">
-    <h2>Результат</h2>
-    <div id="resEmpty" class="empty">Введи цену на Polymarket и коэффициент букмекера.</div>
-    <div id="resBody" hidden>
-      <span class="badge" id="badge"></span>
-      <div class="big" id="roi"></div>
-      <div class="profit" id="profit"></div>
+    <section class="card">
+      <h2>Сумма</h2>
+      <div class="seg" id="segMode">
+        <button type="button" data-val="bank" aria-pressed="true">Общий банк</button>
+        <button type="button" data-val="a" aria-pressed="false">Ставка A</button>
+        <button type="button" data-val="b" aria-pressed="false">Ставка B</button>
+      </div>
+      <div class="row">
+        <label class="field">
+          <span class="lbl" id="amtLabel">Банк</span>
+          <div class="inp"><input id="amt" type="text" inputmode="decimal" autocomplete="off" value="100"><span class="unit" id="amtUnit">$</span></div>
+        </label>
+        <label class="field">
+          <span class="lbl" id="rateLbl">Курс (необяз.)</span>
+          <div class="inp"><input id="rate" type="text" inputmode="decimal" autocomplete="off" placeholder="95"><span class="unit">₽/$</span></div>
+        </label>
+      </div>
+      <div class="hintline" id="amtHint">Банк и ставка на Poly считаются в долларах.</div>
+    </section>
  
-      <div class="legs">
-        <div class="leg">
-          <div class="top"><span class="name">Polymarket</span><span class="odd" id="aOdd"></span></div>
-          <div class="stake" id="aStake"></div>
-          <div class="meta" id="aMeta"></div>
+    <section class="card" id="result">
+      <h2>Результат</h2>
+      <div id="resEmpty" class="empty">Введи цену на Polymarket и коэффициент букмекера.</div>
+      <div id="resBody" hidden>
+        <span class="badge" id="badge"></span>
+        <div class="big" id="roi"></div>
+        <div class="profit" id="profit"></div>
+ 
+        <div class="legs">
+          <div class="leg">
+            <div class="top"><span class="name">Polymarket</span><span class="odd" id="aOdd"></span></div>
+            <div class="stake" id="aStake"></div>
+            <div class="meta" id="aMeta"></div>
+          </div>
+          <div class="leg">
+            <div class="top"><span class="name">Букмекер</span><span class="odd" id="bOdd"></span></div>
+            <div class="stake" id="bStake"></div>
+            <div class="meta" id="bMeta"></div>
+          </div>
         </div>
-        <div class="leg">
-          <div class="top"><span class="name">Букмекер</span><span class="odd" id="bOdd"></span></div>
-          <div class="stake" id="bStake"></div>
-          <div class="meta" id="bMeta"></div>
+ 
+        <div class="stats">
+          <div class="stat"><div class="k">Всего вложить</div><div class="v" id="sTotal"></div></div>
+          <div class="stat"><div class="k">Вернётся</div><div class="v" id="sReturn"></div></div>
+          <div class="stat"><div class="k">Маржа (1/A + 1/B)</div><div class="v" id="sMargin"></div></div>
+          <div class="stat"><div class="k">Комиссия Poly</div><div class="v" id="sFee"></div></div>
         </div>
       </div>
+    </section>
  
-      <div class="stats">
-        <div class="stat"><div class="k">Всего вложить</div><div class="v" id="sTotal"></div></div>
-        <div class="stat"><div class="k">Вернётся</div><div class="v" id="sReturn"></div></div>
-        <div class="stat"><div class="k">Маржа (1/A + 1/B)</div><div class="v" id="sMargin"></div></div>
-        <div class="stat"><div class="k">Комиссия Poly</div><div class="v" id="sFee"></div></div>
+    <button class="btn" id="copy" disabled>Скопировать расчёт</button>
+    <p class="note">Комиссия Polymarket берётся с тейкера и списывается акциями при покупке: эффективный коэффициент = (1/p) × (1 − ставка × (1 − p)). Мейкер-ордера (лимитные) комиссию не платят. Проверяй ставку на реальном рынке перед сделкой.</p>
+  </div>
+ 
+  <!-- ===================== МОИ СТАВКИ ===================== -->
+  <div id="viewBets" hidden>
+    <section class="card">
+      <h2>Ставка на Polymarket (исход A)</h2>
+      <div class="row">
+        <label class="field">
+          <span class="lbl">Сумма</span>
+          <div class="inp"><input id="b_pStake" type="text" inputmode="decimal" autocomplete="off" placeholder="55"><span class="unit">$</span></div>
+        </label>
+        <label class="field">
+          <span class="lbl">Цена входа</span>
+          <div class="inp"><input id="b_pPrice" type="text" inputmode="decimal" autocomplete="off" placeholder="54"><span class="unit">¢</span></div>
+        </label>
       </div>
-    </div>
-  </section>
+      <label class="field gap">
+        <span class="lbl">Комиссия тейкера (0, если лимитка или уже учтена)</span>
+        <div class="inp"><input id="b_pFee" type="text" inputmode="decimal" autocomplete="off" value="5"><span class="unit">%</span></div>
+      </label>
+      <div class="hintline" id="bPHint"></div>
+    </section>
  
-  <button class="btn" id="copy" disabled>Скопировать расчёт</button>
-  <p class="note">Комиссия Polymarket берётся с тейкера и списывается акциями при покупке: эффективный коэффициент = (1/p) × (1 − ставка × (1 − p)). Мейкер-ордера (лимитные) комиссию не платят. Проверяй ставку на реальном рынке перед сделкой.</p>
+    <section class="card">
+      <h2>Ставка на букмекере (исход B)</h2>
+      <span class="lbl">Валюта ставки</span>
+      <div class="seg" id="segWCur">
+        <button type="button" data-val="rub" aria-pressed="true">₽ Рубли</button>
+        <button type="button" data-val="usd" aria-pressed="false">$ Доллары</button>
+      </div>
+      <div class="row">
+        <label class="field">
+          <span class="lbl">Сумма</span>
+          <div class="inp"><input id="b_wStake" type="text" inputmode="decimal" autocomplete="off" placeholder="4200"><span class="unit" id="bWUnit">₽</span></div>
+        </label>
+        <label class="field">
+          <span class="lbl">Коэффициент</span>
+          <div class="inp"><input id="b_wOdd" type="text" inputmode="decimal" autocomplete="off" placeholder="2.27"><span class="unit">×</span></div>
+        </label>
+      </div>
+      <label class="field gap">
+        <span class="lbl" id="bRateLbl">Курс для пересчёта в доллары</span>
+        <div class="inp"><input id="b_rate" type="text" inputmode="decimal" autocomplete="off" placeholder="95"><span class="unit">₽/$</span></div>
+      </label>
+    </section>
+ 
+    <section class="card">
+      <h2>Докупка для выравнивания (необяз.)</h2>
+      <div class="row">
+        <label class="field">
+          <span class="lbl">Текущая цена Poly</span>
+          <div class="inp"><input id="b_nPrice" type="text" inputmode="decimal" autocomplete="off" placeholder="как вход"><span class="unit">¢</span></div>
+        </label>
+        <label class="field">
+          <span class="lbl">Текущий кэф букмекера</span>
+          <div class="inp"><input id="b_nOdd" type="text" inputmode="decimal" autocomplete="off" placeholder="как вход"><span class="unit">×</span></div>
+        </label>
+      </div>
+      <div class="hintline">Если оставить пустым, для докупки берутся входные цена и коэффициент.</div>
+    </section>
+ 
+    <section class="card">
+      <h2>Профит по ставкам</h2>
+      <div id="bEmpty" class="empty">Введи обе ставки, цену и коэффициент.</div>
+      <div id="bBody" hidden>
+        <span class="badge" id="bBadge"></span>
+        <div class="big" id="bBig"></div>
+        <div class="profit" id="bSub"></div>
+ 
+        <div class="legs">
+          <div class="leg">
+            <div class="top"><span class="name">Выиграет A (Polymarket)</span></div>
+            <div class="stake" id="bO1"></div>
+            <div class="meta" id="bO1r"></div>
+          </div>
+          <div class="leg">
+            <div class="top"><span class="name">Выиграет B (букмекер)</span></div>
+            <div class="stake" id="bO2"></div>
+            <div class="meta" id="bO2r"></div>
+          </div>
+        </div>
+ 
+        <div class="stats">
+          <div class="stat"><div class="k">Вложено всего</div><div class="v" id="bTotal"></div></div>
+          <div class="stat"><div class="k">Лучший исход</div><div class="v" id="bBest"></div></div>
+        </div>
+        <div class="eq" id="bEq"></div>
+      </div>
+    </section>
+ 
+    <section class="card">
+      <h2>Запись в историю</h2>
+      <label class="field">
+        <span class="lbl">Название (необяз.)</span>
+        <div class="inp"><input id="b_title" class="txt" type="text" autocomplete="off" maxlength="80" placeholder="OG vs GamerLegion"></div>
+      </label>
+      <div class="btnrow gap">
+        <button class="btn" id="bSave" disabled>Сохранить в историю</button>
+        <button class="btn secondary" id="bReset">Очистить</button>
+      </div>
+    </section>
+    <p class="note">Профит считается от суммы обеих ставок: если выиграл A, возвращаются акции Poly (после комиссии), ставка на букмекере сгорает, и наоборот.</p>
+  </div>
+ 
+  <!-- ===================== ИСТОРИЯ ===================== -->
+  <div id="viewHist" hidden>
+    <section class="card">
+      <h2>Итоги</h2>
+      <div id="hEmpty" class="empty">Пока пусто. Во вкладке «Мои ставки» нажми «Сохранить в историю».</div>
+      <div id="hSum" class="stats" style="margin-top:0" hidden>
+        <div class="stat"><div class="k">Реализовано</div><div class="v" id="hReal"></div></div>
+        <div class="stat"><div class="k">Закрыто ставок</div><div class="v" id="hClosed"></div></div>
+        <div class="stat"><div class="k">Ждут, минимум</div><div class="v" id="hPendMin"></div></div>
+        <div class="stat"><div class="k">Ждут, максимум</div><div class="v" id="hPendMax"></div></div>
+      </div>
+    </section>
+    <div id="histList"></div>
+    <div class="btnrow" id="hBtns" hidden>
+      <button class="btn secondary" id="hCopy">Копировать список</button>
+      <button class="btn secondary" id="hClear">Очистить историю</button>
+    </div>
+    <p class="note">История хранится на этом устройстве, внутри Telegram. Отметь, кто выиграл, чтобы увидеть реализованный профит.</p>
+  </div>
 </div>
  
 <script>
@@ -193,9 +348,10 @@
   var el = {
     pIn: $('pIn'), fee: $('fee'), feeOn: $('feeOn'), feeBox: $('feeBox'), wIn: $('wIn'),
     amt: $('amt'), rate: $('rate'), pLabel: $('pLabel'), pUnit: $('pUnit'), pHint: $('pHint'),
-    amtLabel: $('amtLabel'), copy: $('copy')
+    amtLabel: $('amtLabel'), amtUnit: $('amtUnit'), amtHint: $('amtHint'), rateLbl: $('rateLbl'), copy: $('copy')
   };
-  var state = { pType: 'cents', mode: 'bank' };
+  var state = { pType: 'cents', mode: 'bank', bCur: 'rub' };
+  var view = 'calc';
   var lastText = '';
  
   /* ---------- утилиты ---------- */
@@ -204,36 +360,23 @@
     var v = parseFloat(String(s).replace(',', '.').replace(/\s/g, ''));
     return isNaN(v) ? NaN : v;
   }
-  function fmt(v, d) {
-    return v.toLocaleString('ru-RU', { minimumFractionDigits: d, maximumFractionDigits: d });
-  }
+  function fmt(v, d) { return v.toLocaleString('ru-RU', { minimumFractionDigits: d, maximumFractionDigits: d }); }
   function usd(v) { return '$' + fmt(v, 2); }
+  function rub(v) { return fmt(v, 0) + ' ₽'; }
+  function sgn(v) { return (v >= 0 ? '+' : '−') + usd(Math.abs(v)); }
+  function sgnRub(v) { return (v >= 0 ? '+' : '−') + fmt(Math.abs(v), 0) + ' ₽'; }
+  function cls(v) { return v >= 0 ? 'pos' : 'neg'; }
+  function toFrac(p) { return p > 1 ? p / 100 : p; }
+  function netOdd(price, feeRate) { return (1 / price) * (1 - feeRate * (1 - price)); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
   function haptic(kind) {
     try { if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred(kind); } catch (e) {}
   }
- 
-  /* ---------- сохранение настроек ---------- */
-  var KEY = 'arbcalc_v1';
-  function save() {
-    try {
-      localStorage.setItem(KEY, JSON.stringify({
-        pType: state.pType, mode: state.mode, feeOn: el.feeOn.checked,
-        fee: el.fee.value, amt: el.amt.value, rate: el.rate.value
-      }));
-    } catch (e) {}
-  }
-  function load() {
-    try {
-      var s = JSON.parse(localStorage.getItem(KEY) || 'null');
-      if (!s) return;
-      if (s.pType) state.pType = s.pType;
-      if (s.mode) state.mode = s.mode;
-      if (typeof s.feeOn === 'boolean') el.feeOn.checked = s.feeOn;
-      if (s.fee) el.fee.value = s.fee;
-      if (s.amt) el.amt.value = s.amt;
-      if (s.rate) el.rate.value = s.rate;
-    } catch (e) {}
-  }
+  function curSym() { return state.bCur === 'rub' ? '₽' : '$'; }
  
   /* ---------- сегменты ---------- */
   function setSeg(id, val) {
@@ -250,6 +393,31 @@
     });
   }
  
+  /* ---------- сохранение настроек ---------- */
+  var KEY = 'arbcalc_v1';
+  function save() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({
+        pType: state.pType, mode: state.mode, bCur: state.bCur, feeOn: el.feeOn.checked,
+        fee: el.fee.value, amt: el.amt.value, rate: el.rate.value
+      }));
+    } catch (e) {}
+  }
+  function load() {
+    try {
+      var s = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if (!s) return;
+      if (s.pType) state.pType = s.pType;
+      if (s.mode) state.mode = s.mode;
+      if (s.bCur === 'rub' || s.bCur === 'usd') state.bCur = s.bCur;
+      if (typeof s.feeOn === 'boolean') el.feeOn.checked = s.feeOn;
+      if (s.fee) el.fee.value = s.fee;
+      if (s.amt) el.amt.value = s.amt;
+      if (s.rate) el.rate.value = s.rate;
+    } catch (e) {}
+  }
+ 
+  /* ---------- применение состояния к интерфейсу ---------- */
   function applyPType() {
     setSeg('segPType', state.pType);
     if (state.pType === 'cents') {
@@ -261,10 +429,25 @@
   function applyMode() {
     setSeg('segMode', state.mode);
     el.amtLabel.textContent = state.mode === 'bank' ? 'Банк (на обе ноги)'
-      : state.mode === 'a' ? 'Ставка на Polymarket' : 'Ставка на букмекере ($)';
+      : state.mode === 'a' ? 'Ставка на Polymarket' : 'Ставка на букмекере';
+    el.amtUnit.textContent = state.mode === 'b' ? curSym() : '$';
+    el.amtHint.textContent = state.mode === 'b'
+      ? 'Ставка на букмекере вводится в ' + (state.bCur === 'rub' ? 'рублях, нужен курс.' : 'долларах.')
+      : 'Банк и ставка на Poly считаются в долларах.';
+  }
+  function applyBCur() {
+    setSeg('segBCur', state.bCur);
+    setSeg('segWCur', state.bCur);
+    var b = bEl.wStake;
+    $('bWUnit').textContent = curSym();
+    b.placeholder = state.bCur === 'rub' ? '4200' : '45';
+    el.rateLbl.textContent = state.bCur === 'rub' ? 'Курс ₽/$ (для рублей)' : 'Курс (необяз.)';
+    $('bRateLbl').textContent = state.bCur === 'rub'
+      ? 'Курс для пересчёта в доллары' : 'Курс (необяз., для рублёвого эквивалента)';
+    applyMode();
   }
  
-  /* ---------- расчёт ---------- */
+  /* ---------- расчёт вилки ---------- */
   function calc() {
     var pv = num(el.pIn.value), price, gross;
     if (state.pType === 'cents') {
@@ -284,26 +467,32 @@
     if (!(oB > 1) || !(oA > 1)) return { partial: true, price: price, gross: gross, oA: oA, feeRate: feeRate };
  
     var margin = 1 / oA + 1 / oB;
+    var rate = num(el.rate.value);
+    var out = { price: price, gross: gross, oA: oA, oB: oB, feeRate: feeRate, margin: margin,
+                roi: (1 / margin - 1) * 100, rate: rate };
     var amt = num(el.amt.value);
-    var out = { price: price, gross: gross, oA: oA, oB: oB, feeRate: feeRate, margin: margin, roi: (1 / margin - 1) * 100 };
     if (!(amt > 0)) return out;
  
+    var amtUsd = amt;
+    if (state.mode === 'b' && state.bCur === 'rub') {
+      if (!(rate > 0)) { out.needRate = true; return out; }
+      amtUsd = amt / rate;
+    }
+ 
     var sA, sB, R;
-    if (state.mode === 'bank') { R = amt / margin; sA = R / oA; sB = R / oB; }
-    else if (state.mode === 'a') { sA = amt; R = sA * oA; sB = R / oB; }
-    else { sB = amt; R = sB * oB; sA = R / oA; }
+    if (state.mode === 'bank') { R = amtUsd / margin; sA = R / oA; sB = R / oB; }
+    else if (state.mode === 'a') { sA = amtUsd; R = sA * oA; sB = R / oB; }
+    else { sB = amtUsd; R = sB * oB; sA = R / oA; }
  
     out.sA = sA; out.sB = sB; out.R = R; out.S = sA + sB; out.profit = R - out.S;
-    out.sharesBuy = sA / price;           // куплено акций (брутто)
-    out.feeUsd = sA * feeRate * (1 - price); // комиссия в $-эквиваленте
+    out.sharesBuy = sA / price;
+    out.feeUsd = sA * feeRate * (1 - price);
     return out;
   }
  
-  /* ---------- вывод ---------- */
   function render() {
     var r = calc();
  
-    // подсказка под полем Poly
     if (r && r.oA) {
       el.pHint.innerHTML = 'Цена <b>' + fmt(r.price * 100, 1) + '¢</b> → брутто <b>' + fmt(r.gross, 3) +
         '</b>, после комиссии <b>' + fmt(r.oA, 3) + '</b>';
@@ -335,7 +524,7 @@
     $('sMargin').textContent = fmt(r.margin, 4);
  
     if (r.sA === undefined) {
-      $('profit').innerHTML = 'Введи сумму, чтобы получить ставки.';
+      $('profit').innerHTML = r.needRate ? 'Для ставки в рублях укажи курс ₽/$.' : 'Введи сумму, чтобы получить ставки.';
       $('aStake').textContent = '—'; $('bStake').textContent = '—';
       $('aMeta').textContent = ''; $('bMeta').textContent = '';
       $('sTotal').textContent = '—'; $('sReturn').textContent = '—'; $('sFee').textContent = '—';
@@ -343,36 +532,360 @@
     }
  
     $('profit').innerHTML = (r.profit >= 0 ? 'Гарантированный профит ' : 'Гарантированный убыток ') +
-      '<b>' + (r.profit >= 0 ? '+' : '−') + usd(Math.abs(r.profit)) + '</b>';
+      '<b>' + sgn(r.profit) + '</b>';
     $('aStake').textContent = usd(r.sA);
     $('aMeta').textContent = 'Купить ≈ ' + fmt(r.sharesBuy, 2) + ' акций по ' + fmt(r.price * 100, 1) + '¢';
-    $('bStake').textContent = usd(r.sB);
  
-    var rate = num(el.rate.value);
-    if (rate > 0) {
-      $('bStake').textContent = fmt(r.sB * rate, 0) + ' ₽';
-      $('bMeta').textContent = '≈ ' + usd(r.sB) + ' по курсу ' + fmt(rate, 2);
+    var bText;
+    if (state.bCur === 'rub' && r.rate > 0) {
+      $('bStake').textContent = rub(r.sB * r.rate);
+      $('bMeta').textContent = '≈ ' + usd(r.sB) + ' по курсу ' + fmt(r.rate, 2);
+      bText = rub(r.sB * r.rate) + ' (' + usd(r.sB) + ')';
     } else {
-      $('bMeta').textContent = '';
+      $('bStake').textContent = usd(r.sB);
+      $('bMeta').textContent = state.bCur === 'rub' ? 'Укажи курс ₽/$, чтобы увидеть рубли' :
+        (r.rate > 0 ? '≈ ' + rub(r.sB * r.rate) : '');
+      bText = usd(r.sB);
     }
     $('sTotal').textContent = usd(r.S);
     $('sReturn').textContent = usd(r.R);
     $('sFee').textContent = r.feeRate ? usd(r.feeUsd) : 'нет';
  
     lastText =
-      'Вилка: ' + (good ? '+' : '') + fmt(r.roi, 2) + '% | профит ' + (r.profit >= 0 ? '+' : '−') + usd(Math.abs(r.profit)) + '\n' +
+      'Вилка: ' + (good ? '+' : '') + fmt(r.roi, 2) + '% | профит ' + sgn(r.profit) + '\n' +
       'Poly: ' + usd(r.sA) + ' @ ' + fmt(r.price * 100, 1) + '¢ (кэф ' + fmt(r.oA, 3) + (r.feeRate ? ' после комиссии' : '') + ')\n' +
-      'Букмекер: ' + (rate > 0 ? fmt(r.sB * rate, 0) + ' ₽ (' + usd(r.sB) + ')' : usd(r.sB)) + ' @ ' + fmt(r.oB, 2) + '\n' +
+      'Букмекер: ' + bText + ' @ ' + fmt(r.oB, 2) + '\n' +
       'Банк: ' + usd(r.S) + ' → вернётся ' + usd(r.R);
     el.copy.disabled = false;
   }
  
   function onChange() { save(); render(); }
  
+  /* =====================================================
+     МОИ СТАВКИ
+     ===================================================== */
+  var BKEY = 'arbcalc_bets_v1';
+  var bIds = ['pStake', 'pPrice', 'pFee', 'wStake', 'wOdd', 'rate', 'nPrice', 'nOdd', 'title'];
+  var bEl = {};
+  bIds.forEach(function (k) { bEl[k] = $('b_' + k); });
+  var lastBets = null;     // последний валидный расчёт (для сохранения в историю)
+  var editId = null;       // id записи истории, которую правим
+ 
+  function saveBets() {
+    try {
+      var o = { view: view, f: {} };
+      bIds.forEach(function (k) { o.f[k] = bEl[k].value; });
+      localStorage.setItem(BKEY, JSON.stringify(o));
+    } catch (e) {}
+  }
+  function loadBets() {
+    try {
+      var o = JSON.parse(localStorage.getItem(BKEY) || 'null');
+      if (!o) return;
+      if (o.view === 'calc' || o.view === 'bets' || o.view === 'hist') view = o.view;
+      if (o.f) bIds.forEach(function (k) { if (typeof o.f[k] === 'string') bEl[k].value = o.f[k]; });
+    } catch (e) {}
+  }
+ 
+  function renderBets() {
+    var pS = num(bEl.pStake.value), pp = toFrac(num(bEl.pPrice.value)), f = num(bEl.pFee.value);
+    var fr = (f >= 0 && f < 50) ? f / 100 : 0;
+    var okP = pS > 0 && pp > 0 && pp < 1;
+ 
+    $('bPHint').innerHTML = okP
+      ? 'Получишь ≈ <b>' + fmt(pS * netOdd(pp, fr), 2) + '</b> акций, это <b>' + usd(pS * netOdd(pp, fr)) + '</b> при победе A'
+      : '';
+ 
+    var wS = num(bEl.wStake.value), wO = num(bEl.wOdd.value), rate = num(bEl.rate.value);
+    var hasRate = rate > 0;
+    var isRub = state.bCur === 'rub';
+    var empty = $('bEmpty'), body = $('bBody');
+    lastBets = null;
+ 
+    if (!(okP && wS > 0 && wO > 1 && (!isRub || hasRate))) {
+      empty.hidden = false; body.hidden = true;
+      empty.textContent = (okP && wS > 0 && wO > 1)
+        ? 'Укажи курс ₽/$, чтобы свести обе ставки в доллары.'
+        : 'Введи обе ставки, цену и коэффициент.';
+      $('bSave').disabled = true;
+      return;
+    }
+    empty.hidden = true; body.hidden = false;
+ 
+    var oA = netOdd(pp, fr);
+    var payA = pS * oA;
+    var wUsd = isRub ? wS / rate : wS;
+    var payB = wUsd * wO;
+    var total = pS + wUsd;
+    var p1 = payA - total, p2 = payB - total;
+    var mn = Math.min(p1, p2), mx = Math.max(p1, p2);
+ 
+    var kind = mn > 0 ? 'good' : (mx > 0 ? 'warn' : 'bad');
+    var kindText = kind === 'good' ? 'Профит зафиксирован' : kind === 'warn' ? 'Есть риск убытка' : 'Убыток в обоих исходах';
+    var badge = $('bBadge'), big = $('bBig');
+    badge.className = 'badge ' + kind; badge.textContent = kindText;
+    big.className = 'big ' + kind; big.textContent = sgn(mn);
+    $('bSub').innerHTML = 'В худшем исходе · ROI <b>' + (mn >= 0 ? '+' : '−') + fmt(Math.abs(mn / total * 100), 2) + '%</b>';
+ 
+    var o1 = $('bO1'), o2 = $('bO2');
+    o1.textContent = sgn(p1); o1.className = 'stake ' + cls(p1);
+    o2.textContent = sgn(p2); o2.className = 'stake ' + cls(p2);
+    $('bO1r').textContent = (hasRate ? sgnRub(p1 * rate) + ' · ' : '') + 'Poly выиграла, букмекер сгорел';
+    $('bO2r').textContent = (hasRate ? sgnRub(p2 * rate) + ' · ' : '') + 'букмекер выиграл, Poly сгорела';
+ 
+    $('bTotal').textContent = usd(total) + (hasRate ? ' (' + rub(total * rate) + ')' : '');
+    $('bBest').textContent = sgn(mx);
+ 
+    // выравнивание
+    var np = toFrac(num(bEl.nPrice.value));
+    if (!(np > 0 && np < 1)) np = pp;
+    var nO = num(bEl.nOdd.value);
+    if (!(nO > 1)) nO = wO;
+ 
+    var eq = $('bEq');
+    if (Math.abs(p1 - p2) < 0.01) {
+      eq.innerHTML = 'Исходы уже выровнены: профит ≈ <b>' + sgn(mn) + '</b> в любом исходе.';
+    } else if (p1 < p2) {
+      var x = (p2 - p1) / netOdd(np, fr);
+      eq.innerHTML = 'Чтобы выровнять, докупи на <b>Polymarket (A) ' + usd(x) + '</b> (≈ ' + fmt(x / np, 2) +
+        ' акций по ' + fmt(np * 100, 1) + '¢). Профит станет <b>' + sgn(p2 - x) + '</b> в любом исходе.';
+    } else {
+      var y = (p1 - p2) / nO;
+      var yText = isRub ? '<b>' + rub(y * rate) + '</b> (' + usd(y) + ')'
+                        : '<b>' + usd(y) + '</b>' + (hasRate ? ' (' + rub(y * rate) + ')' : '');
+      eq.innerHTML = 'Чтобы выровнять, докупи на <b>букмекере (B)</b> ' + yText +
+        ' по коэффициенту ' + fmt(nO, 2) + '. Профит станет <b>' + sgn(p1 - y) + '</b> в любом исходе.';
+    }
+ 
+    lastBets = { p1: p1, p2: p2, total: total, kind: kind, kindText: kindText };
+    $('bSave').disabled = false;
+  }
+ 
+  function onBetsChange() { saveBets(); renderBets(); }
+ 
+  /* =====================================================
+     ИСТОРИЯ
+     ===================================================== */
+  var HKEY = 'arbcalc_hist_v1';
+  var hist = [];
+  function loadHist() {
+    try {
+      var a = JSON.parse(localStorage.getItem(HKEY) || '[]');
+      if (Array.isArray(a)) hist = a;
+    } catch (e) {}
+  }
+  function saveHist() {
+    try { localStorage.setItem(HKEY, JSON.stringify(hist.slice(0, 300))); return true; }
+    catch (e) { return false; }
+  }
+  function updateTabCount() {
+    $('tabHist').textContent = hist.length ? 'История (' + hist.length + ')' : 'История';
+  }
+  function realized(r) { return r.result === 'a' ? r.p1 : r.result === 'b' ? r.p2 : null; }
+  function fmtDate(ts) {
+    try {
+      return new Date(ts).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+    } catch (e) { return ''; }
+  }
+  function recTitle(r) { return r.title ? r.title : 'Без названия'; }
+  function recMeta(r) {
+    var sym = r.cur === 'rub' ? '₽' : '$';
+    var wTxt = r.cur === 'rub' ? fmt(num(r.f.wStake) || 0, 0) + ' ₽' : usd(num(r.f.wStake) || 0);
+    return 'Poly ' + usd(num(r.f.pStake) || 0) + ' @ ' + (r.f.pPrice || '?') + '¢ · букмекер ' + wTxt +
+      ' @ ' + (r.f.wOdd || '?') + (sym ? '' : '');
+  }
+ 
+  function renderHist() {
+    updateTabCount();
+    var list = $('histList');
+    var empty = $('hEmpty'), sum = $('hSum'), btns = $('hBtns');
+ 
+    if (!hist.length) {
+      empty.hidden = false; sum.hidden = true; btns.hidden = true; list.innerHTML = '';
+      return;
+    }
+    empty.hidden = true; sum.hidden = false; btns.hidden = false;
+ 
+    var real = 0, closed = 0, pMin = 0, pMax = 0, pending = 0;
+    hist.forEach(function (r) {
+      var v = realized(r);
+      if (v === null) { pending++; pMin += Math.min(r.p1, r.p2); pMax += Math.max(r.p1, r.p2); }
+      else { closed++; real += v; }
+    });
+    var hr = $('hReal');
+    hr.textContent = closed ? sgn(real) : '—';
+    hr.className = 'v ' + (closed ? cls(real) : '');
+    $('hClosed').textContent = closed + ' из ' + hist.length;
+    $('hPendMin').textContent = pending ? sgn(pMin) : '—';
+    $('hPendMax').textContent = pending ? sgn(pMax) : '—';
+ 
+    var html = '';
+    hist.forEach(function (r) {
+      var v = realized(r);
+      var res;
+      if (v === null) {
+        res = '<span class="badge ' + r.kind + '">' + esc(r.kindText) + '</span> ' +
+          'мин <b class="' + cls(Math.min(r.p1, r.p2)) + '">' + sgn(Math.min(r.p1, r.p2)) + '</b> · ' +
+          'макс <b class="' + cls(Math.max(r.p1, r.p2)) + '">' + sgn(Math.max(r.p1, r.p2)) + '</b>';
+      } else {
+        res = 'Итог: выиграл ' + (r.result === 'a' ? 'A (Poly)' : 'B (букмекер)') + ' → <b class="' + cls(v) + '">' + sgn(v) + '</b>';
+      }
+      html += '<div class="hitem" data-id="' + esc(r.id) + '">' +
+        '<div class="htop"><span class="htitle">' + esc(recTitle(r)) + '</span><span class="hdate">' + esc(fmtDate(r.ts)) + '</span></div>' +
+        '<div class="hmeta">' + esc(recMeta(r)) + '</div>' +
+        '<div class="hres">' + res + '</div>' +
+        '<div class="hbtns">' +
+          '<button class="mini" data-act="a" aria-pressed="' + (r.result === 'a') + '">A выиграл</button>' +
+          '<button class="mini" data-act="b" aria-pressed="' + (r.result === 'b') + '">B выиграл</button>' +
+          '<button class="mini" data-act="open">Открыть</button>' +
+          '<button class="mini danger" data-act="del">Удалить</button>' +
+        '</div></div>';
+    });
+    list.innerHTML = html;
+  }
+ 
+  function askConfirm(text, cb) {
+    try {
+      if (tg && tg.showConfirm) { tg.showConfirm(text, function (ok) { if (ok) cb(); }); return; }
+    } catch (e) {}
+    if (window.confirm(text)) cb();
+  }
+ 
+  function findRec(id) {
+    for (var i = 0; i < hist.length; i++) if (hist[i].id === id) return i;
+    return -1;
+  }
+ 
+  function saveToHistory() {
+    if (!lastBets) return;
+    var f = {};
+    bIds.forEach(function (k) { f[k] = bEl[k].value; });
+    var idx = editId ? findRec(editId) : -1;
+    var title = (bEl.title.value || '').trim();
+ 
+    if (idx >= 0) {
+      var old = hist[idx];
+      hist[idx] = { id: old.id, ts: old.ts, title: title, f: f, cur: state.bCur,
+        p1: lastBets.p1, p2: lastBets.p2, total: lastBets.total, kind: lastBets.kind,
+        kindText: lastBets.kindText, result: old.result || null };
+    } else {
+      var rec = { id: 'h' + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36),
+        ts: Date.now(), title: title, f: f, cur: state.bCur,
+        p1: lastBets.p1, p2: lastBets.p2, total: lastBets.total, kind: lastBets.kind,
+        kindText: lastBets.kindText, result: null };
+      hist.unshift(rec);
+      editId = rec.id;
+    }
+    var ok = saveHist();
+    updateTabCount();
+    refreshSaveBtn(ok ? 'Сохранено ✓' : 'Не удалось сохранить');
+    haptic(ok ? 'success' : 'error');
+  }
+ 
+  function refreshSaveBtn(flash) {
+    var b = $('bSave');
+    var base = editId && findRec(editId) >= 0 ? 'Обновить запись' : 'Сохранить в историю';
+    b.textContent = flash || base;
+    if (flash) setTimeout(function () { refreshSaveBtn(); }, 1400);
+  }
+ 
+  function resetBetsForm() {
+    ['pStake', 'pPrice', 'wStake', 'wOdd', 'nPrice', 'nOdd', 'title'].forEach(function (k) { bEl[k].value = ''; });
+    editId = null;
+    refreshSaveBtn();
+    onBetsChange();
+  }
+ 
+  function openRecord(r) {
+    bIds.forEach(function (k) { bEl[k].value = (r.f && typeof r.f[k] === 'string') ? r.f[k] : ''; });
+    if (r.cur === 'rub' || r.cur === 'usd') state.bCur = r.cur;
+    editId = r.id;
+    applyBCur(); save();
+    view = 'bets'; applyView();
+    refreshSaveBtn();
+    onBetsChange();
+    window.scrollTo(0, 0);
+  }
+ 
+  $('histList').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-act]');
+    var item = e.target.closest('.hitem');
+    if (!b || !item) return;
+    var idx = findRec(item.getAttribute('data-id'));
+    if (idx < 0) return;
+    var r = hist[idx], act = b.getAttribute('data-act');
+ 
+    if (act === 'a' || act === 'b') {
+      r.result = (r.result === act) ? null : act;
+      saveHist(); renderHist(); haptic('success');
+    } else if (act === 'open') {
+      openRecord(r);
+    } else if (act === 'del') {
+      askConfirm('Удалить запись «' + recTitle(r) + '»?', function () {
+        hist.splice(findRec(r.id), 1);
+        if (editId === r.id) { editId = null; refreshSaveBtn(); }
+        saveHist(); renderHist();
+      });
+    }
+  });
+ 
+  $('hClear').addEventListener('click', function () {
+    askConfirm('Удалить всю историю (' + hist.length + ' записей)?', function () {
+      hist = []; editId = null; saveHist(); renderHist(); refreshSaveBtn();
+    });
+  });
+ 
+  function copyText(text, btn) {
+    var done = function () {
+      var old = btn.textContent;
+      btn.textContent = 'Скопировано ✓';
+      haptic('success');
+      setTimeout(function () { btn.textContent = old; }, 1400);
+    };
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } else { fallback(); }
+  }
+ 
+  $('hCopy').addEventListener('click', function () {
+    var lines = hist.map(function (r) {
+      var v = realized(r);
+      return fmtDate(r.ts) + ' | ' + recTitle(r) + ' | ' + recMeta(r) + ' | ' +
+        (v === null ? 'ждёт: ' + sgn(Math.min(r.p1, r.p2)) + '…' + sgn(Math.max(r.p1, r.p2))
+                    : 'итог ' + (r.result === 'a' ? 'A' : 'B') + ': ' + sgn(v));
+    });
+    copyText(lines.join('\n'), $('hCopy'));
+  });
+ 
+  $('bSave').addEventListener('click', saveToHistory);
+  $('bReset').addEventListener('click', resetBetsForm);
+ 
+  /* ---------- вкладки ---------- */
+  function applyView() {
+    setSeg('segView', view);
+    $('viewCalc').hidden = view !== 'calc';
+    $('viewBets').hidden = view !== 'bets';
+    $('viewHist').hidden = view !== 'hist';
+    if (view === 'bets' && !bEl.rate.value && el.rate.value) bEl.rate.value = el.rate.value;
+    if (view === 'calc' && !el.rate.value && bEl.rate.value) el.rate.value = bEl.rate.value;
+  }
+ 
   /* ---------- события ---------- */
+  bindSeg('segView', function (v) {
+    view = v; applyView(); saveBets();
+    if (v === 'bets') renderBets();
+    if (v === 'hist') renderHist();
+    if (v === 'calc') render();
+  });
   bindSeg('segPType', function (v) {
     if (v === state.pType) return;
-    // пересчитываем введённое значение в другой формат
     var pv = num(el.pIn.value);
     if (pv > 0) {
       if (v === 'odds' && pv < 100) el.pIn.value = String(Math.round(10000 / pv) / 100);
@@ -381,31 +894,17 @@
     state.pType = v; applyPType(); onChange();
   });
   bindSeg('segMode', function (v) { state.mode = v; applyMode(); onChange(); });
+  function pickCur(v) { state.bCur = v; applyBCur(); save(); render(); renderBets(); }
+  bindSeg('segBCur', pickCur);
+  bindSeg('segWCur', pickCur);
  
   ['pIn', 'fee', 'wIn', 'amt', 'rate'].forEach(function (id) { el[id].addEventListener('input', onChange); });
   el.feeOn.addEventListener('change', function () { el.feeBox.hidden = !el.feeOn.checked; onChange(); });
+  bIds.forEach(function (k) { bEl[k].addEventListener('input', onBetsChange); });
  
-  el.copy.addEventListener('click', function () {
-    if (!lastText) return;
-    var done = function () {
-      var old = el.copy.textContent;
-      el.copy.textContent = 'Скопировано ✓';
-      haptic('success');
-      setTimeout(function () { el.copy.textContent = old; }, 1400);
-    };
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(lastText).then(done, fallback);
-    } else { fallback(); }
-    function fallback() {
-      var ta = document.createElement('textarea');
-      ta.value = lastText; ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); done(); } catch (e) {}
-      document.body.removeChild(ta);
-    }
-  });
+  el.copy.addEventListener('click', function () { if (lastText) copyText(lastText, el.copy); });
  
-  /* ---------- параметры из ссылки: ?p=54&w=2.27&b=100&fee=5&mode=bank ---------- */
+  /* ---------- параметры из ссылки: ?p=54&w=2.27&b=100&fee=5&mode=bank&cur=usd ---------- */
   function fromUrl() {
     var q = new URLSearchParams(location.search);
     var startParam = '';
@@ -415,23 +914,47 @@
     if (q.has('p')) {
       var p = num(q.get('p'));
       if (p > 0) {
-        if (p <= 1) p = p * 100;             // 0.54 -> 54¢
+        if (p <= 1) p = p * 100;
         state.pType = 'cents';
         el.pIn.value = String(Math.round(p * 100) / 100);
+        view = 'calc';
       }
     }
     if (q.has('w')) el.wIn.value = q.get('w');
     if (q.has('b')) { el.amt.value = q.get('b'); state.mode = 'bank'; }
     if (q.has('fee')) { el.fee.value = q.get('fee'); el.feeOn.checked = num(q.get('fee')) > 0; }
     if (q.has('rate')) el.rate.value = q.get('rate');
+    if (q.get('cur') === 'usd' || q.get('cur') === 'rub') state.bCur = q.get('cur');
     if (q.get('mode') === 'a' || q.get('mode') === 'b') state.mode = q.get('mode');
   }
  
+  /* =====================================================
+     КЛАВИАТУРА: тап в любое место вне поля закрывает её
+     ===================================================== */
+  document.addEventListener('pointerdown', function (e) {
+    var a = document.activeElement;
+    if (a && a.tagName === 'INPUT' && a.type === 'text' && !e.target.closest('.inp')) a.blur();
+  }, true);
+  document.addEventListener('keydown', function (e) {
+    var a = document.activeElement;
+    if (e.key === 'Enter' && a && a.tagName === 'INPUT') a.blur();
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('input[type="text"]'), function (i) {
+    i.setAttribute('enterkeyhint', 'done');
+  });
+ 
+  /* ---------- старт ---------- */
   load();
+  loadBets();
+  loadHist();
   fromUrl();
-  applyPType(); applyMode();
+  applyPType(); applyBCur(); applyMode(); applyView();
   el.feeBox.hidden = !el.feeOn.checked;
+  refreshSaveBtn();
+  updateTabCount();
   render();
+  renderBets();
+  if (view === 'hist') renderHist();
 })();
 </script>
 </body>
